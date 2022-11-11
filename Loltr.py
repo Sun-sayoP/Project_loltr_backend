@@ -395,7 +395,6 @@ def monthinfo(summonerName):
 def main(summonerName) :
     #summonerName = request.args.get('name')
     data=[]
-    print(data)
     data.append((user(summonerName),monthinfo(summonerName)))
     data_json= json.dumps(data,ensure_ascii=False)
     res = make_response(data_json)

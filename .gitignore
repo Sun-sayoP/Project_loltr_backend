@@ -20,5 +20,5 @@ bin/*.txt
 # ignore all .pdf files in the doc/ directory and any of its subdirectories
 # /** matches 0 or more directories
 doc/**/*.pdf
-
+# add API_KEY
 config.py
