@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+    <title>플레이어 검색결과</title>
+</head>
+<body>
+    <p>
+        {{sum_name}}님의 정보결과
+    </p>
+    {% if length != 0 %}
+        {% for result in results %}
+            <div> {{result[0]}} 닉네임</div>
+            <div> {{result[1]}} 레벨 </div>
+            <div> {{result[2]}} 아이콘Id</div>
+            <br>
+        {% endfor %}
+    {% endif %}
+    <form action = '/'>
+        다시 검색하기 <input type="submit" value="Submit"/>
+    </form>
+</body>

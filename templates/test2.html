@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <title>플레이어 검색결과</title>
+</head>
+<body>
+    <p>
+        {{sum_name}}님의 정보결과
+    </p>
+    {% if length != 0 %}
+            <div> {{results}} 정보 </div>
+    {% endif %}
+    <form action = '/'>
+        다시 검색하기 <input type="submit" value="Submit"/>
+    </form>
+</body>
