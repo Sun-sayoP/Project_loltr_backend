@@ -4,16 +4,14 @@ import config
 from urllib import parse
 import json
 from datetime import datetime
-import time
-from flask import Flask, render_template,request    
+from flask import Flask, request    
 from flask_cors import CORS
 from flask import make_response
 
-app = Flask(__name__, template_folder="templates")
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
-app.config['JSON_AS_ASCII'] = False
+app = Flask(__name__)
+
 CORS(app)
+
 monthrate = {
         "month": 
     {
@@ -235,7 +233,7 @@ timerate = {
 }
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return "hello world"
 
 def user(summonerName):
     encodingSummonerName = parse.quote(summonerName)
@@ -268,7 +266,6 @@ def user(summonerName):
     
     print(results)
     return results
-    #return data["name"],data["summonerLevel"],data["profileIconId"]
 
 def userpuuid(summonerName):
     encodingSummonerName = parse.quote(summonerName)
@@ -395,11 +392,11 @@ def monthinfo(summonerName):
 
 @app.route('/monthsearch/<summonerName>',methods=['GET'])
 def main(summonerName) :
-    #summonerName = request.args.get('name')
     data=[]
     data.append((user(summonerName),monthinfo(summonerName)))
     data_json= json.dumps(data,ensure_ascii=False)
     res = make_response(data_json)
-    #length = len(data_json)
-    #return render_template('test2.html',sum_name=summonerName,results=data_json,length=length)
     return res
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=False)
