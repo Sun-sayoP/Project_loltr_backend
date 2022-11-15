@@ -22,7 +22,6 @@ headers = {
         "Origin": "https://developer.riotgames.com",
         "X-Riot-Token": config.API_KEY
         }
-#puuid = None
 def user(summonerName):
     encodingSummonerName = parse.quote(summonerName)
     APIURL = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + encodingSummonerName
@@ -31,7 +30,6 @@ def user(summonerName):
     results.append(res.json()["name"])
     results.append(res.json()["summonerLevel"])
     results.append(res.json()["profileIconId"])
-    #global puuid= json.load( res.json()['puuid']
     encrypted_id = res.json()['id']
     url_league = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/{}".format(encrypted_id)
     res_league = requests.get(url=url_league,headers=headers)
@@ -64,16 +62,20 @@ def matches(userpuuid) :
 
 def monthinfo(summonerName,userpuuid):
     matchId = matches (userpuuid)
-    print(matchId)
-    checkpuuid =userpuuid   
+    print(matchId)   
     wincolection =[] 
-    for i in range(0,20) :
+    for i in range(0,20):
         APIURL = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId[i]
         res = requests.get(APIURL, headers=headers)
         data = res.json()
         win = 0
+        if data["info"] in data :
+          try:
+            print(data["info"])
+          except:
+            print("error")
         for i in range(0,10) :
-            if checkpuuid== data["info"]["participants"][i]["puuid"] :
+            if userpuuid== data["info"]["participants"][i]["puuid"] :
                 win = i
                 break
         gametime= datetime.fromtimestamp(data["info"]["gameStartTimestamp"] / 1000)
