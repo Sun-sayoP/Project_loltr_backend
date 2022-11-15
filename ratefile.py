@@ -1,6 +1,4 @@
 monthrate = {
-        "month": 
-    {
       "January":  {
         "win":0,
         "defeat":0,
@@ -49,7 +47,6 @@ monthrate = {
         "win":0,
         "defeat":0,
       }
-    }
 }
 
 dayrate = {

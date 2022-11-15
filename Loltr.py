@@ -22,30 +22,19 @@ headers = {
         "Origin": "https://developer.riotgames.com",
         "X-Riot-Token": config.API_KEY
         }
+json_results={}
 def user(summonerName):
     encodingSummonerName = parse.quote(summonerName)
     APIURL = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + encodingSummonerName
-    results = []
     res = requests.get(APIURL, headers=headers)
-    results.append(res.json()["name"])
-    results.append(res.json()["summonerLevel"])
-    results.append(res.json()["profileIconId"])
+    json_results["name"] = res.json()["name"]
+    json_results["summonerName"] = res.json()["summonerLevel"]
+    json_results["profileIconId"] = res.json()["profileIconId"]
     encrypted_id = res.json()['id']
-    url_league = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/{}".format(encrypted_id)
+    url_league = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/"+ encrypted_id
     res_league = requests.get(url=url_league,headers=headers)
-    league_dicts = res_league.json()
-    def get_league_info(league_dict):
-        res = [
-        league_dict.get('tier'),
-        league_dict.get('rank'),
-            ]
-        return res
-    
-    for league_dict in league_dicts:
-        results.append(get_league_info(league_dict))
-    
-    print(results)
-    return results
+    json_results["tier"]= res_league.json()[0]["tier"]
+    json_results["rank"]= res_league.json()[0]["rank"]
 
 def userpuuid(summonerName):
     encodingSummonerName = parse.quote(summonerName)
@@ -60,20 +49,14 @@ def matches(userpuuid) :
     data = res.json()
     return data
 
-def monthinfo(summonerName,userpuuid):
-    matchId = matches (userpuuid)
-    print(matchId)   
+def monthinfo(userpuuid):
+    matchId = matches (userpuuid) 
     wincolection =[] 
     for i in range(0,20):
         APIURL = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId[i]
         res = requests.get(APIURL, headers=headers)
         data = res.json()
         win = 0
-        if data["info"] in data :
-          try:
-            print(data["info"])
-          except:
-            print("error")
         for i in range(0,10) :
             if userpuuid== data["info"]["participants"][i]["puuid"] :
                 win = i
@@ -82,83 +65,81 @@ def monthinfo(summonerName,userpuuid):
 
         if (gametime.month == 1):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["January"]["win"] +=1
+                ratefile.monthrate["January"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["January"]["defeat"]+=1
+                ratefile.monthrate["January"]["defeat"]+=1
         elif (gametime.month == 2):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["February"]["win"] +=1
+                ratefile.monthrate["February"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["February"]["defeat"]+=1
+                ratefile.monthrate["February"]["defeat"]+=1
         elif (gametime.month == 3):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["March"]["win"] +=1
+                ratefile.monthrate["March"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["March"]["defeat"]+=1
+                ratefile.monthrate["March"]["defeat"]+=1
         elif (gametime.month == 4):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["April"]["win"] +=1
+                ratefile.monthrate["April"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["April"]["defeat"]+=1
+                ratefile.monthrate["April"]["defeat"]+=1
         elif (gametime.month == 5):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["May"]["win"] +=1
+                ratefile.monthrate["May"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["May"]["defeat"]+=1
+                ratefile.monthrate["May"]["defeat"]+=1
         elif (gametime.month == 6):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["June"]["win"] +=1
+                ratefile.monthrate["June"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["June"]["defeat"]+=1
+                ratefile.monthrate["June"]["defeat"]+=1
         elif (gametime.month == 7):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["July"]["win"] +=1
+                ratefile.monthrate["July"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["July"]["defeat"]+=1
+                ratefile.monthrate["July"]["defeat"]+=1
         elif (gametime.month == 8):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["August"]["win"] +=1
+                ratefile.monthrate["August"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["August"]["defeat"]+=1
+                ratefile.monthrate["August"]["defeat"]+=1
         elif (gametime.month == 9):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["September"]["win"] +=1
+                ratefile.monthrate["September"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["September"]["defeat"]+=1
+                ratefile.monthrate["September"]["defeat"]+=1
         elif (gametime.month == 10):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["October"]["win"] +=1
+                ratefile.monthrate["October"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["October"]["defeat"]+=1
+                ratefile.monthrate["October"]["defeat"]+=1
         elif (gametime.month == 11):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["November"]["win"] +=1
+                ratefile.monthrate["November"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["November"]["defeat"]+=1
+                ratefile.monthrate["November"]["defeat"]+=1
         elif (gametime.month == 12):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["month"]["December"]["win"] +=1
+                ratefile.monthrate["December"]["win"] +=1
             else :
-                ratefile.monthrate["month"]["December"]["defeat"]+=1
+                ratefile.monthrate["December"]["defeat"]+=1
         
         wincolection.append((data["info"]["participants"][win]["win"]))
     
     wincount =wincolection.count(True)
     defeatcount =wincolection.count(False)
     ratecount = (wincount/(wincount+defeatcount)*100)
-    recent_rate = {
-        "recent_rate": ratecount,
-        "recent_win" : wincount, 
-        "recent_defeat" : defeatcount
-    }
-    return ratefile.monthrate,recent_rate
+    json_results["recent_rate"]= ratecount
+    json_results["recent_win"] = wincount
+    json_results["recent_defeat"] = defeatcount
+    json_results["monthrate"] = ratefile.monthrate
 
-@app.route('/monthsearch/<summonerName>',methods=['GET'])
+@app.route('/monthsearch/<summonerName>', methods=['GET'])
 def main(summonerName) :
-    data=[]
-    data.append(user(summonerName))
-    data.append(monthinfo(summonerName,userpuuid(summonerName)))
-    data_json= json.dumps(data,ensure_ascii=False)
+    user(summonerName)
+    monthinfo(userpuuid(summonerName))
+    data_json= json.dumps(json_results,indent =3,ensure_ascii=False)
+    print(data_json)
     res = make_response(data_json)
     res.headers["Access-Control-Allow-Origin"] = "*"
     res.headers["Access-Control-Allow-Credentials"]="True"
