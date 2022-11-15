@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import Flask, request    
 from flask_cors import CORS
 from flask import make_response
+from collections import defaultdict
 
 app = Flask(__name__)
 
@@ -23,13 +24,15 @@ headers = {
         "X-Riot-Token": config.API_KEY
         }
 json_results={}
+new_month=ratefile.monthrate
 def user(summonerName):
     encodingSummonerName = parse.quote(summonerName)
     APIURL = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + encodingSummonerName
     res = requests.get(APIURL, headers=headers)
     json_results["name"] = res.json()["name"]
-    json_results["summonerName"] = res.json()["summonerLevel"]
-    json_results["profileIconId"] = res.json()["profileIconId"]
+    json_results["summonerLevel"] = res.json()["summonerLevel"]
+    iconurl= json.dumps(res.json()["profileIconId"])
+    json_results["profileIconId"] ="http://ddragon.leagueoflegends.com/cdn/12.21.1/img/profileicon/"+iconurl+".png"
     encrypted_id = res.json()['id']
     url_league = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/"+ encrypted_id
     res_league = requests.get(url=url_league,headers=headers)
@@ -51,80 +54,84 @@ def matches(userpuuid) :
 
 def monthinfo(userpuuid):
     matchId = matches (userpuuid) 
+    
     wincolection =[] 
     for i in range(0,20):
+      if matchId[i] in matchId:
         APIURL = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId[i]
         res = requests.get(APIURL, headers=headers)
         data = res.json()
         win = 0
         for i in range(0,10) :
             if userpuuid== data["info"]["participants"][i]["puuid"] :
+                print(data["info"]["participants"][i]["puuid"])
                 win = i
                 break
         gametime= datetime.fromtimestamp(data["info"]["gameStartTimestamp"] / 1000)
 
         if (gametime.month == 1):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["January"]["win"] +=1
+                new_month["January"]["win"] +=1
             else :
-                ratefile.monthrate["January"]["defeat"]+=1
+                new_month["January"]["defeat"]+=1
         elif (gametime.month == 2):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["February"]["win"] +=1
+                new_month["February"]["win"] +=1
             else :
-                ratefile.monthrate["February"]["defeat"]+=1
+                new_month["February"]["defeat"]+=1
         elif (gametime.month == 3):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["March"]["win"] +=1
+                new_month["March"]["win"] +=1
             else :
-                ratefile.monthrate["March"]["defeat"]+=1
+                new_month["March"]["defeat"]+=1
         elif (gametime.month == 4):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["April"]["win"] +=1
+                new_month["April"]["win"] +=1
             else :
-                ratefile.monthrate["April"]["defeat"]+=1
+                new_month["April"]["defeat"]+=1
         elif (gametime.month == 5):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["May"]["win"] +=1
+                new_month["May"]["win"] +=1
             else :
-                ratefile.monthrate["May"]["defeat"]+=1
+                new_month["May"]["defeat"]+=1
         elif (gametime.month == 6):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["June"]["win"] +=1
+                new_month["June"]["win"] +=1
             else :
-                ratefile.monthrate["June"]["defeat"]+=1
+                new_month["June"]["defeat"]+=1
         elif (gametime.month == 7):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["July"]["win"] +=1
+                new_month["July"]["win"] +=1
             else :
-                ratefile.monthrate["July"]["defeat"]+=1
+                new_month["July"]["defeat"]+=1
         elif (gametime.month == 8):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["August"]["win"] +=1
+                new_month["August"]["win"] +=1
             else :
-                ratefile.monthrate["August"]["defeat"]+=1
+                new_month["August"]["defeat"]+=1
         elif (gametime.month == 9):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["September"]["win"] +=1
+                new_month["September"]["win"] +=1
             else :
-                ratefile.monthrate["September"]["defeat"]+=1
+                new_month["September"]["defeat"]+=1
         elif (gametime.month == 10):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["October"]["win"] +=1
+                new_month["October"]["win"] +=1
             else :
-                ratefile.monthrate["October"]["defeat"]+=1
+                new_month["October"]["defeat"]+=1
         elif (gametime.month == 11):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["November"]["win"] +=1
+                new_month["November"]["win"] +=1
             else :
-                ratefile.monthrate["November"]["defeat"]+=1
+                new_month["November"]["defeat"]+=1
         elif (gametime.month == 12):
             if data["info"]["participants"][win]["win"]==True :
-                ratefile.monthrate["December"]["win"] +=1
+                new_month["December"]["win"] +=1
             else :
-                ratefile.monthrate["December"]["defeat"]+=1
+                new_month["December"]["defeat"]+=1
         
         wincolection.append((data["info"]["participants"][win]["win"]))
+      else : print("key error ??")
     
     wincount =wincolection.count(True)
     defeatcount =wincolection.count(False)
@@ -132,15 +139,15 @@ def monthinfo(userpuuid):
     json_results["recent_rate"]= ratecount
     json_results["recent_win"] = wincount
     json_results["recent_defeat"] = defeatcount
-    json_results["monthrate"] = ratefile.monthrate
+    json_results["monthrate"] = new_month
 
 @app.route('/monthsearch/<summonerName>', methods=['GET'])
 def main(summonerName) :
     user(summonerName)
     monthinfo(userpuuid(summonerName))
-    data_json= json.dumps(json_results,indent =3,ensure_ascii=False)
-    print(data_json)
-    res = make_response(data_json)
+    #data_json = json.dumps(json_results,ensure_ascii=False)
+    #new_month.update({}.fromkeys(new_month, 0))
+    res = make_response(json_results)
     res.headers["Access-Control-Allow-Origin"] = "*"
     res.headers["Access-Control-Allow-Credentials"]="True"
     return res
