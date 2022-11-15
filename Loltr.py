@@ -38,6 +38,9 @@ def user(summonerName):
     res_league = requests.get(url=url_league,headers=headers)
     json_results["tier"]= res_league.json()[0]["tier"]
     json_results["rank"]= res_league.json()[0]["rank"]
+    json_results["rank_wins"]= res_league.json()[0]["wins"]
+    json_results["rank_losses"]= res_league.json()[0]["losses"]
+
 
 def userpuuid(summonerName):
     encodingSummonerName = parse.quote(summonerName)
@@ -137,8 +140,8 @@ def monthinfo(userpuuid):
     defeatcount =wincolection.count(False)
     ratecount = (wincount/(wincount+defeatcount)*100)
     json_results["recent_rate"]= ratecount
-    json_results["recent_win"] = wincount
-    json_results["recent_defeat"] = defeatcount
+    json_results["recent_wins"] = wincount
+    json_results["recent_losses"] = defeatcount
     json_results["monthrate"] = new_month
 
 @app.route('/monthsearch/<summonerName>', methods=['GET'])
