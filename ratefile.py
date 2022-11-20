@@ -216,3 +216,43 @@ timerate = {
       }
     }
 }
+
+mostrate ={
+      "champ1":  {
+        "name":"",
+        "win":0,
+        "defeat":0,
+        "link":""
+      },
+      "champ2":  {
+        "name":"",
+        "win":0,
+        "defeat":0,
+        "link":""
+      },
+      "champ3":  {
+        "name":"",
+        "win":0,
+        "defeat":0,
+        "link":""
+      },
+      "item1":  {
+        "code":"",
+        "win":0,
+        "defeat":0,
+        "link":""
+      },
+      "item2":  {
+        "code":"",
+        "win":0,
+        "defeat":0,
+        "link":""
+      },
+      "item3":  {
+        "code":"",
+        "win":0,
+        "defeat":0,
+        "link":""
+      }
+
+}
