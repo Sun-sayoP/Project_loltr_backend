@@ -217,7 +217,7 @@ timerate = {
     }
 }
 
-mostrate ={
+mostchamp ={
       "champ1":  {
         "name":"",
         "win":0,
@@ -235,7 +235,10 @@ mostrate ={
         "win":0,
         "defeat":0,
         "link":""
-      },
+      }
+}
+
+mostitem ={
       "item1":  {
         "code":"",
         "win":0,
@@ -254,5 +257,4 @@ mostrate ={
         "defeat":0,
         "link":""
       }
-
 }

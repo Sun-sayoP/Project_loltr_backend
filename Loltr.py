@@ -10,17 +10,6 @@ from flask import make_response
 from collections import defaultdict
 from collections import Counter
 
-
-json_results={}
-
-
-app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
-CORS(app)
-
-@app.route('/')
-def index():
-    return "Hello it's your rate"
 headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
         "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -28,6 +17,15 @@ headers = {
         "Origin": "https://developer.riotgames.com",
         "X-Riot-Token": config.API_KEY
         }
+json_results={}
+app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
+CORS(app)
+
+@app.route('/')
+def index():
+    return "Hello it's your rate"
+
 
 def user(summonerName):
     encodingSummonerName = parse.quote(summonerName)
@@ -35,8 +33,8 @@ def user(summonerName):
     res = requests.get(APIURL, headers=headers)
     json_results["name"] = res.json()["name"]
     json_results["summonerLevel"] = res.json()["summonerLevel"]
-    iconurl= json.dumps(res.json()["profileIconId"])
-    json_results["profileIconId"] ="http://ddragon.leagueoflegends.com/cdn/12.21.1/img/profileicon/"+iconurl+".png"
+    iconId= json.dumps(res.json()["profileIconId"])
+    json_results["profileIconId"] ="http://ddragon.leagueoflegends.com/cdn/12.22.1/img/profileicon/"+iconId+".png"
     encrypted_id = res.json()['id']
     url_league = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/"+ encrypted_id
     res_league = requests.get(url=url_league,headers=headers)
@@ -159,61 +157,60 @@ def monthinfo(userpuuid):
     item1=str(mostitem[0][0])
     item2=str(mostitem[1][0])
     item3=str(mostitem[2][0])
-    ratefile.mostrate["champ1"]["name"]=champ1
-    ratefile.mostrate["champ2"]["name"]=champ2
-    ratefile.mostrate["champ3"]["name"]=champ3
-    ratefile.mostrate["champ1"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.21.1/img/champion/"+champ1+".png"
-    ratefile.mostrate["champ2"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.21.1/img/champion/"+champ2+".png"
-    ratefile.mostrate["champ3"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.21.1/img/champion/"+champ3+".png"
-    ratefile.mostrate["item1"]["code"]=item1
-    ratefile.mostrate["item2"]["code"]=item2
-    ratefile.mostrate["item3"]["code"]=item3
-    ratefile.mostrate["item1"]["link"]="https://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/"+item1+".png"
-    ratefile.mostrate["item2"]["link"]="https://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/"+item2+".png"
-    ratefile.mostrate["item3"]["link"]="https://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/"+item3+".png"
-    print(wincollection[8][2])
-    for i in range(0,20) :
+    ratefile.mostchamp["champ1"]["name"]=champ1
+    ratefile.mostchamp["champ2"]["name"]=champ2
+    ratefile.mostchamp["champ3"]["name"]=champ3
+    ratefile.mostchamp["champ1"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ1+".png"
+    ratefile.mostchamp["champ2"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ2+".png"
+    ratefile.mostchamp["champ3"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ3+".png"
+    ratefile.mostitem["item1"]["code"]=item1
+    ratefile.mostitem["item2"]["code"]=item2
+    ratefile.mostitem["item3"]["code"]=item3
+    ratefile.mostitem["item1"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item1+".png"
+    ratefile.mostitem["item2"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item2+".png"
+    ratefile.mostitem["item3"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item3+".png"
+    for i in range(0,20) : 
         if wincollection[i][1] ==True :
             wincount+=1
         elif wincollection[i][1] ==False:
             defeatcount+=1
         if item1 in wincollection[i][2] :
-            print("hello")
             if wincollection[i][1]==True:
-                ratefile.mostrate["item1"]["win"]+=1
+                ratefile.mostitem["item1"]["win"]+=1
             else :
-                ratefile.mostrate["item1"]["defeat"]+=1
+                ratefile.mostitem["item1"]["defeat"]+=1
         elif item2 in wincollection[i][2] :
             if wincollection[i][1]==True:
-                ratefile.mostrate["item2"]["win"]+=1
+                ratefile.mostitem["item2"]["win"]+=1
             else :
-                ratefile.mostrate["item2"]["defeat"]+=1
+                ratefile.mostitem["item2"]["defeat"]+=1
         elif item3 in wincollection[i][2] :
             if wincollection[i][1]==True:
-                ratefile.mostrate["item3"]["win"]+=1
+                ratefile.mostitem["item3"]["win"]+=1
             else :
-                ratefile.mostrate["item3"]["defeat"]+=1
+                ratefile.mostitem["item3"]["defeat"]+=1
         if champ1 in wincollection[i][0] :
             if wincollection[i][1]==True:
-                ratefile.mostrate["champ1"]["win"]+=1
+                ratefile.mostchamp["champ1"]["win"]+=1
             else :
-                ratefile.mostrate["champ1"]["defeat"]+=1
+                ratefile.mostchamp["champ1"]["defeat"]+=1
         elif champ2 in wincollection[i][0] :
             if wincollection[i][1]==True:
-                ratefile.mostrate["champ2"]["win"]+=1
+                ratefile.mostchamp["champ2"]["win"]+=1
             else :
-                ratefile.mostrate["champ2"]["defeat"]+=1
+                ratefile.mostchamp["champ2"]["defeat"]+=1
         elif champ3 in wincollection[i][0] :
             if wincollection[i][1]==True:
-                ratefile.mostrate["champ3"]["win"]+=1
+                ratefile.mostchamp["champ3"]["win"]+=1
             else :
-                ratefile.mostrate["champ3"]["defeat"]+=1
+                ratefile.mostchamp["champ3"]["defeat"]+=1
     ratecount = (wincount/(wincount+defeatcount)*100)
     json_results["recent_rate"]= ratecount
     json_results["recent_wins"] = wincount
     json_results["recent_losses"] = defeatcount
     json_results["monthrate"] = ratefile.monthrate
-    json_results["mostrate"] =ratefile.mostrate
+    json_results["mostchamp"] =ratefile.mostchamp
+    json_results["mostitem"] =ratefile.mostitem
 
 def monthclear(monthrate) :
     monthrate["January"]["win"]=0
@@ -242,13 +239,32 @@ def monthclear(monthrate) :
     monthrate["December"]["defeat"]=0
     return monthrate
 
+def mostchampclear(mostchamp) :
+    mostchamp["champ1"]["win"]=0
+    mostchamp["champ1"]["defeat"]=0
+    mostchamp["champ2"]["win"]=0
+    mostchamp["champ2"]["defeat"]=0
+    mostchamp["champ3"]["win"]=0
+    mostchamp["champ3"]["defeat"]=0
+    return mostchamp
+
+def mostitemclear(mostitem) :
+    mostitem["item1"]["win"]=0
+    mostitem["item1"]["defeat"]=0
+    mostitem["item2"]["win"]=0
+    mostitem["item2"]["defeat"]=0
+    mostitem["item3"]["win"]=0
+    mostitem["item3"]["defeat"]=0
+    return mostitem
+
 @app.route('/monthsearch/<summonerName>', methods=['GET'])
 def main(summonerName) :
     user(summonerName)
     monthinfo(userpuuid(summonerName))
     res = make_response(json_results)
-    print(ratefile.monthrate)
     monthclear(ratefile.monthrate)
+    mostchampclear(ratefile.mostchamp)
+    mostitemclear(ratefile.mostitem)
     res.headers["Access-Control-Allow-Origin"] = "*"
     res.headers["Access-Control-Allow-Credentials"]="True"
     return res
