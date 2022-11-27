@@ -205,7 +205,7 @@ def monthinfo(userpuuid):
             else :
                 ratefile.mostchamp["champ3"]["defeat"]+=1
     ratecount = (wincount/(wincount+defeatcount)*100)
-    json_results["recent_rate"]= ratecount
+    json_results["recent_rate"]= int(ratecount)
     json_results["recent_wins"] = wincount
     json_results["recent_losses"] = defeatcount
     json_results["monthrate"] = ratefile.monthrate
