@@ -71,7 +71,7 @@ def monthinfo(userpuuid):
         player = 0
         itemlist=[]
         for i in range(0,10) :
-            if userpuuid== data["info"]["participants"][i]["puuid"] :
+            if userpuuid== data["metadata"]["participants"][i] :
                 player = i
                 break
         gametime= datetime.fromtimestamp(data["info"]["gameStartTimestamp"] / 1000)
@@ -205,6 +205,7 @@ def monthinfo(userpuuid):
             else :
                 ratefile.mostchamp["champ3"]["defeat"]+=1
     ratecount = (wincount/(wincount+defeatcount)*100)
+    print(ratefile.mostitem)
     json_results["recent_rate"]= int(ratecount)
     json_results["recent_wins"] = wincount
     json_results["recent_losses"] = defeatcount

@@ -242,7 +242,7 @@ mostitem ={
       "item1":  {
         "code":"",
         "win":3,
-        "defeat":1,
+        "defeat":2,
         "link":""
       },
       "item2":  {
@@ -254,7 +254,7 @@ mostitem ={
       "item3":  {
         "code":"",
         "win":1,
-        "defeat":3,
+        "defeat":2,
         "link":""
       }
 }
