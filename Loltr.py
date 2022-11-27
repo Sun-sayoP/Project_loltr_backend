@@ -4,6 +4,7 @@ import config
 from urllib import parse
 import json
 from datetime import datetime
+from datetime import time
 from flask import Flask, request    
 from flask_cors import CORS
 from flask import make_response
@@ -213,6 +214,274 @@ def monthinfo(userpuuid):
     json_results["mostchamp"] =ratefile.mostchamp
     json_results["mostitem"] =ratefile.mostitem
 
+def dayinfo(userpuuid):
+    matchId = matches (userpuuid) 
+    champlist=[]
+    allitem=[]
+    wincollection =[]
+    wincount=0
+    defeatcount=0
+    for i in range(0,20):
+      if matchId[i] in matchId:
+        APIURL = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId[i]
+        res = requests.get(APIURL, headers=headers)
+        data = res.json()
+        player = 0
+        itemlist=[]
+        for i in range(0,10) :
+            if userpuuid== data["metadata"]["participants"][i] :
+                player = i
+                break
+        gametime= datetime.fromtimestamp(data["info"]["gameStartTimestamp"] / 1000)
+        champlist.append(data["info"]["participants"][player]["championName"])
+        itemlist.append(data["info"]["participants"][player]["item0"])
+        itemlist.append(data["info"]["participants"][player]["item1"])
+        itemlist.append(data["info"]["participants"][player]["item2"])
+        itemlist.append(data["info"]["participants"][player]["item3"])
+        itemlist.append(data["info"]["participants"][player]["item4"])
+        itemlist.append(data["info"]["participants"][player]["item5"])
+        itemlist.append(data["info"]["participants"][player]["item6"])
+        remove_set={0,3111,2052,3158,3006,3020}
+        itemlist=[i for i in itemlist if i not in remove_set]
+        allitem.append(itemlist)
+        if (gametime.weekday() == 0):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.dayrate["Mon"]["win"] +=1
+            else :
+                ratefile.dayrate["Mon"]["defeat"]+=1
+        elif (gametime.weekday() == 1):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.dayrate["Tue"]["win"] +=1
+            else :
+                ratefile.dayrate["Tue"]["defeat"]+=1
+        elif (gametime.weekday() == 2):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.dayrate["Wed"]["win"] +=1
+            else :
+                ratefile.dayrate["Wed"]["defeat"]+=1
+        elif (gametime.weekday() == 3):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.dayrate["Thu"]["win"] +=1
+            else :
+                ratefile.dayrate["Thu"]["defeat"]+=1
+        elif (gametime.weekday() == 4):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.dayrate["Fri"]["win"] +=1
+            else :
+                ratefile.dayrate["Fri"]["defeat"]+=1
+        elif (gametime.weekday() == 5):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.dayrate["Sat"]["win"] +=1
+            else :
+                ratefile.dayrate["Sat"]["defeat"]+=1
+        elif (gametime.weekday() == 6):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.dayrate["Sun"]["win"] +=1
+            else :
+                ratefile.dayrate["Sun"]["defeat"]+=1
+        
+        wincollection.append((data["info"]["participants"][player]["championName"],data["info"]["participants"][player]["win"],itemlist))
+      else : print("key error")
+    allitem=sum(allitem,[])
+    mostchamp =Counter(champlist).most_common(n=3)
+    mostitem= Counter(allitem).most_common(n=3)
+    champ1=mostchamp[0][0]
+    champ2=mostchamp[1][0]
+    champ3=mostchamp[2][0]
+    item1=str(mostitem[0][0])
+    item2=str(mostitem[1][0])
+    item3=str(mostitem[2][0])
+    ratefile.mostchamp["champ1"]["name"]=champ1
+    ratefile.mostchamp["champ2"]["name"]=champ2
+    ratefile.mostchamp["champ3"]["name"]=champ3
+    ratefile.mostchamp["champ1"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ1+".png"
+    ratefile.mostchamp["champ2"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ2+".png"
+    ratefile.mostchamp["champ3"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ3+".png"
+    ratefile.mostitem["item1"]["code"]=item1
+    ratefile.mostitem["item2"]["code"]=item2
+    ratefile.mostitem["item3"]["code"]=item3
+    ratefile.mostitem["item1"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item1+".png"
+    ratefile.mostitem["item2"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item2+".png"
+    ratefile.mostitem["item3"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item3+".png"
+    for i in range(0,20) : 
+        if wincollection[i][1] ==True :
+            wincount+=1
+        elif wincollection[i][1] ==False:
+            defeatcount+=1
+        if item1 in wincollection[i][2] :
+            if wincollection[i][1]==True:
+                ratefile.mostitem["item1"]["win"]+=1
+            else :
+                ratefile.mostitem["item1"]["defeat"]+=1
+        elif item2 in wincollection[i][2] :
+            if wincollection[i][1]==True:
+                ratefile.mostitem["item2"]["win"]+=1
+            else :
+                ratefile.mostitem["item2"]["defeat"]+=1
+        elif item3 in wincollection[i][2] :
+            if wincollection[i][1]==True:
+                ratefile.mostitem["item3"]["win"]+=1
+            else :
+                ratefile.mostitem["item3"]["defeat"]+=1
+        if champ1 in wincollection[i][0] :
+            if wincollection[i][1]==True:
+                ratefile.mostchamp["champ1"]["win"]+=1
+            else :
+                ratefile.mostchamp["champ1"]["defeat"]+=1
+        elif champ2 in wincollection[i][0] :
+            if wincollection[i][1]==True:
+                ratefile.mostchamp["champ2"]["win"]+=1
+            else :
+                ratefile.mostchamp["champ2"]["defeat"]+=1
+        elif champ3 in wincollection[i][0] :
+            if wincollection[i][1]==True:
+                ratefile.mostchamp["champ3"]["win"]+=1
+            else :
+                ratefile.mostchamp["champ3"]["defeat"]+=1
+    ratecount = (wincount/(wincount+defeatcount)*100)
+    json_results["recent_rate"]= int(ratecount)
+    json_results["recent_wins"] = wincount
+    json_results["recent_losses"] = defeatcount
+    json_results["dayrate"] = ratefile.dayrate
+    json_results["mostchamp"] =ratefile.mostchamp
+    json_results["mostitem"] =ratefile.mostitem
+
+def timeinfo(userpuuid):
+    matchId = matches (userpuuid) 
+    champlist=[]
+    allitem=[]
+    wincollection =[]
+    wincount=0
+    defeatcount=0
+    for i in range(0,20):
+      if matchId[i] in matchId:
+        APIURL = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId[i]
+        res = requests.get(APIURL, headers=headers)
+        data = res.json()
+        player = 0
+        itemlist=[]
+        for i in range(0,10) :
+            if userpuuid== data["metadata"]["participants"][i] :
+                player = i
+                break
+        gametime= datetime.fromtimestamp(data["info"]["gameStartTimestamp"] / 1000)
+        champlist.append(data["info"]["participants"][player]["championName"])
+        itemlist.append(data["info"]["participants"][player]["item0"])
+        itemlist.append(data["info"]["participants"][player]["item1"])
+        itemlist.append(data["info"]["participants"][player]["item2"])
+        itemlist.append(data["info"]["participants"][player]["item3"])
+        itemlist.append(data["info"]["participants"][player]["item4"])
+        itemlist.append(data["info"]["participants"][player]["item5"])
+        itemlist.append(data["info"]["participants"][player]["item6"])
+        remove_set={0,3111,2052,3158,3006,3020}
+        itemlist=[i for i in itemlist if i not in remove_set]
+        allitem.append(itemlist)
+        if (gametime.hour >=0 and gametime.hour <3):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["0-3"]["win"] +=1
+            else :
+                ratefile.timerate["0-3"]["defeat"]+=1
+        elif (gametime.hour >=3 and gametime.hour <6):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["3-6"]["win"] +=1
+            else :
+                ratefile.timerate["3-6"]["defeat"]+=1
+        elif (gametime.hour >=6 and gametime.hour <9):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["6-9"]["win"] +=1
+            else :
+                ratefile.timerate["6-9"]["defeat"]+=1
+        elif (gametime.hour >=9 and gametime.hour <12):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["9-12"]["win"] +=1
+            else :
+                ratefile.timerate["9-12"]["defeat"]+=1
+        elif (gametime.hour >=12 and gametime.hour <15):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["12-15"]["win"] +=1
+            else :
+                ratefile.timerate["12-15"]["defeat"]+=1
+        elif (gametime.hour >=15 and gametime.hour <18):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["15-18"]["win"] +=1
+            else :
+                ratefile.timerate["15-18"]["defeat"]+=1
+        elif (gametime.hour >=18 and gametime.hour <21):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["18-21"]["win"] +=1
+            else :
+                ratefile.timerate["18-21"]["defeat"]+=1
+        elif (gametime.hour >=21 and gametime.hour <24):
+            if data["info"]["participants"][player]["win"]==True :
+                ratefile.timerate["21-24"]["win"] +=1
+            else :
+                ratefile.timerate["21-24"]["defeat"]+=1
+        
+        wincollection.append((data["info"]["participants"][player]["championName"],data["info"]["participants"][player]["win"],itemlist))
+      else : print("key error")
+    allitem=sum(allitem,[])
+    mostchamp =Counter(champlist).most_common(n=3)
+    mostitem= Counter(allitem).most_common(n=3)
+    champ1=mostchamp[0][0]
+    champ2=mostchamp[1][0]
+    champ3=mostchamp[2][0]
+    item1=str(mostitem[0][0])
+    item2=str(mostitem[1][0])
+    item3=str(mostitem[2][0])
+    ratefile.mostchamp["champ1"]["name"]=champ1
+    ratefile.mostchamp["champ2"]["name"]=champ2
+    ratefile.mostchamp["champ3"]["name"]=champ3
+    ratefile.mostchamp["champ1"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ1+".png"
+    ratefile.mostchamp["champ2"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ2+".png"
+    ratefile.mostchamp["champ3"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/"+champ3+".png"
+    ratefile.mostitem["item1"]["code"]=item1
+    ratefile.mostitem["item2"]["code"]=item2
+    ratefile.mostitem["item3"]["code"]=item3
+    ratefile.mostitem["item1"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item1+".png"
+    ratefile.mostitem["item2"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item2+".png"
+    ratefile.mostitem["item3"]["link"]="https://ddragon.leagueoflegends.com/cdn/12.22.1/img/item/"+item3+".png"
+    for i in range(0,20) : 
+        if wincollection[i][1] ==True :
+            wincount+=1
+        elif wincollection[i][1] ==False:
+            defeatcount+=1
+        if item1 in wincollection[i][2] :
+            if wincollection[i][1]==True:
+                ratefile.mostitem["item1"]["win"]+=1
+            else :
+                ratefile.mostitem["item1"]["defeat"]+=1
+        elif item2 in wincollection[i][2] :
+            if wincollection[i][1]==True:
+                ratefile.mostitem["item2"]["win"]+=1
+            else :
+                ratefile.mostitem["item2"]["defeat"]+=1
+        elif item3 in wincollection[i][2] :
+            if wincollection[i][1]==True:
+                ratefile.mostitem["item3"]["win"]+=1
+            else :
+                ratefile.mostitem["item3"]["defeat"]+=1
+        if champ1 in wincollection[i][0] :
+            if wincollection[i][1]==True:
+                ratefile.mostchamp["champ1"]["win"]+=1
+            else :
+                ratefile.mostchamp["champ1"]["defeat"]+=1
+        elif champ2 in wincollection[i][0] :
+            if wincollection[i][1]==True:
+                ratefile.mostchamp["champ2"]["win"]+=1
+            else :
+                ratefile.mostchamp["champ2"]["defeat"]+=1
+        elif champ3 in wincollection[i][0] :
+            if wincollection[i][1]==True:
+                ratefile.mostchamp["champ3"]["win"]+=1
+            else :
+                ratefile.mostchamp["champ3"]["defeat"]+=1
+    ratecount = (wincount/(wincount+defeatcount)*100)
+    json_results["recent_rate"]= int(ratecount)
+    json_results["recent_wins"] = wincount
+    json_results["recent_losses"] = defeatcount
+    json_results["timerate"] = ratefile.timerate
+    json_results["mostchamp"] =ratefile.mostchamp
+    json_results["mostitem"] =ratefile.mostitem
 def monthclear(monthrate) :
     monthrate["January"]["win"]=0
     monthrate["January"]["defeat"]=0
@@ -240,6 +509,41 @@ def monthclear(monthrate) :
     monthrate["December"]["defeat"]=0
     return monthrate
 
+def dayclear(dayrate) :
+    dayrate["Mon"]["win"]=0
+    dayrate["Mon"]["defeat"]=0
+    dayrate["Tue"]["defeat"]=0
+    dayrate["Wed"]["win"]=0
+    dayrate["Wed"]["defeat"]=0
+    dayrate["Thu"]["win"]=0
+    dayrate["Thu"]["defeat"]=0
+    dayrate["Fri"]["win"]=0
+    dayrate["Fri"]["defeat"]=0
+    dayrate["Sat"]["win"]=0
+    dayrate["Sat"]["defeat"]=0
+    dayrate["Sun"]["win"]=0
+    dayrate["Sun"]["defeat"]=0
+    return dayrate
+
+def timeclear(timerate) :
+    timerate["0-3"]["win"]=0
+    timerate["0-3"]["defeat"]=0
+    timerate["3-6"]["win"]=0
+    timerate["3-6"]["defeat"]=0
+    timerate["6-9"]["win"]=0
+    timerate["6-9"]["defeat"]=0
+    timerate["9-12"]["win"]=0
+    timerate["9-12"]["defeat"]=0
+    timerate["12-15"]["win"]=0
+    timerate["12-15"]["defeat"]=0
+    timerate["15-18"]["win"]=0
+    timerate["15-18"]["defeat"]=0
+    timerate["18-21"]["win"]=0
+    timerate["18-21"]["defeat"]=0
+    timerate["21-24"]["win"]=0
+    timerate["21-24"]["defeat"]=0
+    return timerate
+
 def mostchampclear(mostchamp) :
     mostchamp["champ1"]["win"]=0
     mostchamp["champ1"]["defeat"]=0
@@ -259,11 +563,35 @@ def mostitemclear(mostitem) :
     return mostitem
 
 @app.route('/monthsearch/<summonerName>', methods=['GET'])
-def main(summonerName) :
+def monthsearch(summonerName) :
     user(summonerName)
     monthinfo(userpuuid(summonerName))
     res = make_response(json_results)
     monthclear(ratefile.monthrate)
+    mostchampclear(ratefile.mostchamp)
+    mostitemclear(ratefile.mostitem)
+    res.headers["Access-Control-Allow-Origin"] = "*"
+    res.headers["Access-Control-Allow-Credentials"]="True"
+    return res
+
+@app.route('/daysearch/<summonerName>', methods=['GET'])
+def daysearch(summonerName) :
+    user(summonerName)
+    dayinfo(userpuuid(summonerName))
+    res = make_response(json_results)
+    dayclear(ratefile.dayrate)
+    mostchampclear(ratefile.mostchamp)
+    mostitemclear(ratefile.mostitem)
+    res.headers["Access-Control-Allow-Origin"] = "*"
+    res.headers["Access-Control-Allow-Credentials"]="True"
+    return res
+
+@app.route('/timesearch/<summonerName>', methods=['GET'])
+def timesearch(summonerName) :
+    user(summonerName)
+    timeinfo(userpuuid(summonerName))
+    res = make_response(json_results)
+    timeclear(ratefile.timerate)
     mostchampclear(ratefile.mostchamp)
     mostitemclear(ratefile.mostitem)
     res.headers["Access-Control-Allow-Origin"] = "*"
